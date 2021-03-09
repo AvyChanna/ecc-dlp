@@ -1,8 +1,7 @@
-import math
 from collections import namedtuple
 from textwrap import dedent
 
-import labmath as lm
+from utils import isprime, modinv, polyroots_prime, sqrtmod_prime
 
 ec_point = namedtuple("ec_point", "x y z", defaults=(1, ))
 ec_point.is_origin = (lambda x: x.z == 0)  # type: ignore
@@ -12,7 +11,7 @@ ec_point.__repr__ = (lambda x: f"Pt({x.x}, {x.y})" if x.z == 1 else "Pt(Origin)"
 class ec_curve:
 	# Elliptic curve over finite prime field Z/nZ
 	def __init__(self, a: int, b: int, p: int):
-		assert lm.bpsw(p)
+		assert isprime(p)
 		self.p = p
 		self.a = a % p
 		self.b = b % p
@@ -21,14 +20,14 @@ class ec_curve:
 		a4b27 = a4 + b27
 		self.discriminant = -16 * a4b27
 		assert self.discriminant != 0
-		self.j_invariant = 1728 + (a4 * lm.modinv(a4b27, self.p))
+		self.j_invariant = 1728 + (a4 * modinv(a4b27, self.p))
 		self.card = None
 
 	def from_x(self, x):
 		# y2 = [x^3 + ax +b] mod p
 		y2 = (x * x * x + self.a * x + self.b) % self.p
 		# screw tonelli shanks, hensel lift rocks
-		candidates = [lm.sqrtmod_prime(y2, self.p)]
+		candidates = [sqrtmod_prime(y2, self.p)]
 		assert len(candidates) != 0
 		if candidates[0] != 0:
 			candidates.append((self.p - candidates[0]))
@@ -37,7 +36,7 @@ class ec_curve:
 	def from_y(self, y):
 		# 1x^3 + 0x^2 + ax^1 + (b - y*y) = 0 mod p
 		poly = [(self.b - y * y) % self.p, self.a, 0, 1]
-		candidates = list(lm.polyroots_prime(poly, self.p))
+		candidates = list(polyroots_prime(poly, self.p))
 		assert len(candidates) != 0
 		return candidates
 
@@ -54,9 +53,9 @@ class ec_curve:
 		if (pt1.y + pt2.y) % self.p == 0 and pt1.x == pt2.x:
 			return ec_point(0, 0)
 		if pt1.x == pt2.x and pt1.y == pt2.y:
-			temp = (((3 * pt1.x * pt1.x) + self.a) * lm.modinv(2 * pt1.y, self.p)) % self.p
+			temp = (((3 * pt1.x * pt1.x) + self.a) * modinv(2 * pt1.y, self.p)) % self.p
 		else:
-			temp = ((pt2.y - pt1.y) * lm.modinv(pt2.x - pt1.x, self.p)) % self.p
+			temp = ((pt2.y - pt1.y) * modinv(pt2.x - pt1.x, self.p)) % self.p
 		x = (temp * temp - pt1.x - pt2.x) % self.p
 		y = (temp * (pt1.x - x) - pt1.y) % self.p
 
@@ -115,33 +114,6 @@ class ec_curve:
 				OR
 				add_sage_to_path();import sage.all as s; s.EllipticCurve(GF({self.p}), [{self.a},{self.b}]).order()"""))
 
-	def bsgs(self, g, f, n):
-		m = math.ceil(math.sqrt(n))
-		baby_step = {self.multiply(i, g): i for i in range(m)}
-		m_inv = self.multiply(-m, g)
-		y = f
-		for i in range(m):
-			if y in baby_step:
-				return i * m + baby_step[y]
-			y = self.add(f, m_inv)
-		return None
-
-	def pohlig_hellman(self, g, f, n):
-		subgroups = n
-		if isinstance(n, int):
-			subgroups = lm.factorint(n)
-		factors = [i * j for i, j in subgroups.items()]
-		prod = 1
-		for i in factors:
-			prod *= i
-		exponents = [prod // i for i in factors]
-		remainders = []
-		for factor, power in zip(factors, exponents):
-			g_power_k = self.multiply(power, g)
-			r_power_k = self.multiply(power, f)
-			remainders.append(self.bsgs(g_power_k, r_power_k, factor))
-		return lm.crt(remainders, factors)
-
 	def _pollard_rho_step(self, r, a, b, g, f, n):
 		# Hash fn = x mod 3
 		choice = (r.x + r.y) % 3
@@ -174,5 +146,5 @@ class ec_curve:
 		# ai*g + bi*f = ai2*g + bi2*f
 		# (ai-ai2)*g = (bi2-bi)*f
 		# x = (ai-ai2)/(bi2-bi) = (ai2-ai)/(bi-bi2)
-		x = ((ai2 - ai) * lm.modinv(bi - bi2, n)) % n
+		x = ((ai2 - ai) * modinv(bi - bi2, n)) % n
 		return x
