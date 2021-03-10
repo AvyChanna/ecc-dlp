@@ -64,4 +64,5 @@ def test_pollard_rho():
 	assert res == k
 
 
-test_pollard_rho()
+if __name__ == "__main__":
+	test_pollard_rho()
