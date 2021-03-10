@@ -10,3 +10,7 @@ We will also be implementing attacks where these algorithms can potentially lead
 
 1. Avneet Singh Channa, 170101015
 2. Aranya Aryaman, 170101011
+
+
+A good repo to watch performance of different algos
+https://github.com/Telariust/pollard-kangaroo
