@@ -1,8 +1,7 @@
-from math import gcd
 from random import randrange
 
 from ec import ec_curve
-from utils import xgcd
+from utils import modinv
 
 
 def pollard_rho_step(curve, g, f, n, r, a, b):
@@ -17,10 +16,15 @@ def pollard_rho_step(curve, g, f, n, r, a, b):
 		return (curve.add(g, r), a + 1, b)
 
 
-def pollard_rho(curve, g, f, n):
+def pollard_rho(curve, g, f, n, init_a=1, init_b=0, max_tries=3):
+	if max_tries == 0:
+		return None
 	# ri1 = ai1*g + bi1*f
-	ri1, ai1, bi1 = g, 1, 0
-	ri2, ai2, bi2 = g, 1, 0
+	ag = curve.mult(init_a, g)
+	bf = curve.mult(init_b, f)
+	ag_bf = curve.add(ag, bf)
+	ri1, ai1, bi1 = ag_bf, init_a, init_b
+	ri2, ai2, bi2 = ag_bf, init_a, init_b
 
 	# One step for ri1, 2 steps for ri2
 	ri1, ai1, bi1 = pollard_rho_step(curve, g, f, n, ri1, ai1, bi1)
@@ -36,39 +40,28 @@ def pollard_rho(curve, g, f, n):
 	# ai1*g + bi1*f = ai2*g + bi2*f
 	# (ai1-ai2)*g = (bi2-bi1)*f
 	# x = (ai1-ai2)/(bi2-bi1) = (ai2-ai1)/(bi1-bi2)
-	import math
-	print((ai2 - ai1))
-	print((bi1 - bi2))
-	lhs = (ai2 - ai1) % n
-	rhs = (bi1 - bi2) % n
-	print(lhs, rhs)
-	x = (lhs * xgcd(rhs, n)[1]) % n
-	# TODO
+
+	# An edge case where we get 0*G = 0*F. In this case we start from scratch,
+	# but with random(different) initial values. The probability that this will
+	# continuously fail should be fairly low. Nonetheless, we exit after `max_tries` failures
+	if (bi1 - bi2) % n == 0:
+		return pollard_rho(curve, g, f, n, init_a + randrange(0, n), init_b + randrange(0, n), max_tries - 1)
+
+	x = ((ai2 - ai1) * modinv(bi1 - bi2, n)) % n
 	return x
 
 
 def test_pollard_rho():
-	a = 45181635
-	b = 124806060
+	a = 2
+	b = 9
 	p = 1035418103
-	order = 1035393330
-	k = 884158742
-	# k = randrange(2, order)
+	order = 1035356653
+	k = randrange(2, order)
 	curve = ec_curve(a, b, p)
-	pt1 = curve(734830775, 908510221)
+	pt1 = curve(769278016, 752868328)
 	pt2 = curve.mult(k, pt1)
 	res = pollard_rho(curve, pt1, pt2, order)
-	print(k, res)
+	assert res == k
 
 
 test_pollard_rho()
-
-# lhs = 867599962
-# rhs = 513486386
-# k = 884158742
-# order = 1035393330
-#
-#
-#
-#
-#
