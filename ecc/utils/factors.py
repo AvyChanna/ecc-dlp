@@ -134,11 +134,13 @@ def primefac(n, trial=1000, rho=42000, methods=(pollardrho_brent, )):
 					g = gcd(x - y, n)
 			if isprime(g):
 				yield g
-			else: factors.append(g)
+			else:
+				factors.append(g)
 			n //= g
 			if isprime(n):
 				yield n
-			else: factors.append(n)
+			else:
+				factors.append(n)
 		except Exception:
 			difficult.append(n)
 
@@ -153,7 +155,8 @@ def primefac(n, trial=1000, rho=42000, methods=(pollardrho_brent, )):
 		n //= f
 		if isprime(n):
 			yield n
-		else: factors.append(n)
+		else:
+			factors.append(n)
 
 
 def factorint(n, trial=1000, rho=42000, methods=(pollardrho_brent, )):

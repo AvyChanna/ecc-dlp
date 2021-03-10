@@ -96,8 +96,10 @@ def sqrtmod_prime(a, p):
 		k, v, w, q, Q = (p + 1) // 2, 2, h % p, 1, 1
 		for kj in bin(k)[2:]:
 			q = (q * Q) % p
-			if kj == '1': Q, v, w = (q * a) % p, (w * v - h * q) % p, (w * w - 2 * q * a) % p
-			else: Q, w, v = q, (w * v - h * q) % p, (v * v - 2 * q) % p
+			if kj == '1':
+				Q, v, w = (q * a) % p, (w * v - h * q) % p, (w * w - 2 * q * a) % p
+			else:
+				Q, w, v = q, (w * v - h * q) % p, (v * v - 2 * q) % p
 		return (v * k) % p
 	else:
 		return a  # p = 2

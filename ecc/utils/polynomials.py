@@ -84,6 +84,7 @@ def polyval(f, x, m=None):
 			out = (a + out * x) % m
 	return out
 
+
 def polyroots_prime(f, p, sqfr=False):
 	assert isprime(p)
 	g = f[:]
