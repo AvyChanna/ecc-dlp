@@ -5,22 +5,24 @@ from pollard_rho import test_pollard_rho
 from smart import test_smart
 
 tests = {
-    "bsgs": test_bsgs,
-    "pohlig": test_pohlig,
-    "smart": test_smart,
-    "pollard_rho": test_pollard_rho,
-    "pollard_kangaroo": test_pollard_kangaroo,
+    "BABY_STEP_GIANT_STEP": test_bsgs,
+    "POHLIG_HELLMAN": test_pohlig,
+    "SMART": test_smart,
+    "POLLARD_RHO": test_pollard_rho,
+    "POLLARD_KANGAROO": test_pollard_kangaroo,
 }
 
 
-def test():
+def test_all():
 	for name, test in tests.items():
 		try:
 			test()
-			print(f"[*] PASSED TEST {name}")
-		except:
-			print(f"[!] FAILED TEST {name}")
+			print(f"\033[92m[*] PASSED TEST \033[94m{name}\033[0m")
+		except KeyboardInterrupt:
+			break
+		except:  # pylint: disable=bare-except
+			print(f"\033[91m[!] FAILED TEST \033[93m{name}")
 
 
 if __name__ == "__main__":
-	test()
+	test_all()

@@ -2,9 +2,13 @@ from collections import namedtuple
 
 from utils import isprime, modinv, polyroots_prime, sqrtmod_prime
 
-ec_point = namedtuple("ec_point", "x y z", defaults=(1, ))
-ec_point.is_origin = (lambda x: x.z == 0)  # type: ignore
-ec_point.__repr__ = (lambda x: f"pt({x.x}, {x.y})" if x.z == 1 else "Pt(Origin)")  # type: ignore
+
+class ec_point(namedtuple("ec_point", "x y z", defaults=(1, ))):
+	def is_origin(self):
+		return self.z == 0
+
+	def __repr__(self):
+		return f"pt({self.x}, {self.y})" if self.z == 1 else "Pt(Origin)"
 
 
 class ec_curve:
@@ -32,14 +36,15 @@ class ec_curve:
 		# screw tonelli shanks, hensel lift rocks
 		candidate = sqrtmod_prime(y2, self.p)
 		if (candidate**2) % self.p == y2:
-			return [ec_point(x, candidate), ec_point(x, self.p - candidate)]
+			return list(set(ec_point(x, candidate), ec_point(x, (self.p - candidate) % self.p)))
+		# for convenience, this won't raise
 		return None
 
 	def from_y(self, y):
-		# 1x^3 + 0x^2 + ax^1 + (b - y*y) = 0 mod p
+		# Find solution(s) to x^3 + ax + (b - y^2) = 0 mod p
 		poly = [(self.b - y * y) % self.p, self.a, 0, 1]
 		candidates = list(polyroots_prime(poly, self.p))
-		assert len(candidates) != 0, "no point with y={y}"
+		assert len(candidates) != 0, "no point with y={y} on {self}"
 		return candidates
 
 	def check(self, pt):
@@ -91,6 +96,9 @@ class ec_curve:
 	def mult(self, n, pt):
 		return self.multiply(n, pt)
 
+	def mul(self, n, pt):
+		return self.multiply(n, pt)
+
 	def cardinality(self):
 		if self.card is not None:
 			return self.card
@@ -112,7 +120,7 @@ class ec_curve:
 
 	def _cardinality_schoof(self):
 		# TODO - needs math for endomorphism, torsion, division polynomials
-		raise NotImplementedError(f"Schoof algorithm is currently not implemented. In the meantime, use sage")
+		raise NotImplementedError("Schoof algorithm is currently not implemented. In the meantime, use sage")
 
 	def __call__(self, x, y, z=1):
 		res = ec_point(x, y, z)

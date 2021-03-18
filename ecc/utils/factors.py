@@ -7,17 +7,18 @@ from .number_theory import gcd, ilog, ispower, isprime, isqrt, primegen
 
 
 def pollardrho_brent(n):
-	if isprime(n): return n
+	if isprime(n):
+		return n
 	g = n
 	while g == n:
 		y, c, m, g, r, q = randrange(1, n), randrange(1, n), randrange(1, n), 1, 1, 1
 		while g == 1:
 			x, k = y, 0
-			for i in range(r):
+			for _ in range(r):
 				y = (y**2 + c) % n
 			while k < r and g == 1:
 				ys = y
-				for i in range(min(m, r - k)):
+				for _ in range(min(m, r - k)):
 					y = (y**2 + c) % n
 					q = q * abs(x - y) % n
 				g, k = gcd(q, n), k + m
@@ -32,9 +33,11 @@ def pollardrho_brent(n):
 
 
 def pollard_pm1(n, B1=100, B2=1000):
-	if isprime(n): return n
+	if isprime(n):
+		return n
 	m = ispower(n)
-	if m: return m[0]
+	if m:
+		return m[0]
 	while True:
 		pg = primegen()
 		q = 2
@@ -65,16 +68,20 @@ def williams_pp1(n):
 	if isprime(n):
 		return n
 	m = ispower(n)
-	if m: return m[0]
+	if m:
+		return m[0]
 	for v in count(3):
 		for p in primegen():
 			e = ilog(isqrt(n), p)
-			if e == 0: break
+			if e == 0:
+				break
 			for _ in range(e):
 				v = mlucas(v, p, n)
 			g = gcd(v - 2, n)
-			if 1 < g < n: return g
-			if g == n: break
+			if 1 < g < n:
+				return g
+			if g == n:
+				break
 
 
 def multifactor(n, methods):
@@ -95,7 +102,8 @@ def primefac(n, trial=1000, rho=42000, methods=(pollardrho_brent, )):
 	if n < 0:
 		yield -1
 		n *= -1
-	if n < 2: return
+	if n < 2:
+		return
 	if isprime(n):
 		yield n
 		return
@@ -109,7 +117,8 @@ def primefac(n, trial=1000, rho=42000, methods=(pollardrho_brent, )):
 				n //= p
 			nroot = isqrt(n)
 		if p > nroot:
-			if n != 1: yield n
+			if n != 1:
+				yield n
 			return
 	if isprime(n):
 		yield n
@@ -126,7 +135,8 @@ def primefac(n, trial=1000, rho=42000, methods=(pollardrho_brent, )):
 				x, c, g = randrange(1, n), randrange(1, n), 1
 				y = x
 				while g == 1:
-					if rhocount >= rho: raise Exception
+					if rhocount >= rho:
+						raise ValueError
 					rhocount += 1
 					x = (x**2 + c) % n
 					y = (y**2 + c) % n
@@ -141,7 +151,7 @@ def primefac(n, trial=1000, rho=42000, methods=(pollardrho_brent, )):
 				yield n
 			else:
 				factors.append(n)
-		except Exception:
+		except ValueError:
 			difficult.append(n)
 
 	factors = difficult

@@ -5,7 +5,8 @@ from .number_theory import isprime, legendre, modinv, sqrtmod_prime
 
 
 def polyaddmodp(a, b, p):
-	if a is None or b is None: return None
+	if a is None or b is None:
+		return None
 	c = [(x + y) % p for (x, y) in zip_longest(a, b, fillvalue=0)]
 	while len(c) > 0 and c[-1] == 0:
 		del c[-1]
@@ -13,7 +14,8 @@ def polyaddmodp(a, b, p):
 
 
 def polysubmodp(a, b, p):
-	if a is None or b is None: return None
+	if a is None or b is None:
+		return None
 	c = [(x - y) % p for (x, y) in zip_longest(a, b, fillvalue=0)]
 	while len(c) > 0 and c[-1] == 0:
 		del c[-1]
@@ -21,7 +23,8 @@ def polysubmodp(a, b, p):
 
 
 def polymulmodp(a, b, p):
-	if a is None or b is None: return None
+	if a is None or b is None:
+		return None
 	c = [0] * (len(a) + len(b) - 1)
 	for (k, x) in enumerate(a):
 		for (l, y) in enumerate(b):
@@ -34,12 +37,15 @@ def polymulmodp(a, b, p):
 
 
 def polydivmodmodp(a, b, p):
-	if a is None or b is None or b == []: return (None, None)
+	if a is None or b is None or b == []:
+		return (None, None)
 	ndeg, ddeg = len(a) - 1, len(b) - 1
-	if ndeg < ddeg: return ([], a[:])
+	if ndeg < ddeg:
+		return ([], a[:])
 	num, den = a[:], b[:]
 	c = modinv(b[-1], p)
-	if c is None: return (None, None)
+	if c is None:
+		return (None, None)
 	term = [0] * (ndeg - ddeg) + [(num[-1] * c) % p]
 	newnum = polysubmodp(num, polymulmodp(den, term, p), p)
 	quo, rem = polydivmodmodp(newnum, den, p)
@@ -52,25 +58,32 @@ def polydivmodmodp(a, b, p):
 
 
 def polypowmodpmodpoly(a, e, p, f):  # a**e mod p mod f
-	if a is None or f is None or f == []: return None
+	if a is None or f is None or f == []:
+		return None
 	ans, a = [1], polydivmodmodp(a, f, p)[1]
 	for k in bin(e)[2:]:
 		ans = polydivmodmodp(polymulmodp(ans, ans, p), f, p)[1]
-		if k == '1': ans = polydivmodmodp(polymulmodp(ans, a, p), f, p)[1]
+		if k == '1':
+			ans = polydivmodmodp(polymulmodp(ans, a, p), f, p)[1]
 	return ans
 
 
 def gcmd(f, g, p):
-	if (f is None) or (g is None) or f == [] == g: return None
+	if (f is None) or (g is None) or f == [] == g:
+		return None
 	df, dg = len(f) - 1, len(g) - 1
-	if dg > df: u, v = g[:], f[:]
-	else: u, v = f[:], g[:]
+	if dg > df:
+		u, v = g[:], f[:]
+	else:
+		u, v = f[:], g[:]
 	while v != []:
 		r = polydivmodmodp(u, v, p)[1]
-		if r is None: return None
+		if r is None:
+			return None
 		u, v = v[:], r
 	c = modinv(u[-1], p)
-	if c is None: return None
+	if c is None:
+		return None
 	return [(x * c) % p for x in u]
 
 
@@ -93,7 +106,8 @@ def polyroots_prime(f, p, sqfr=False):
 	if g == []:
 		yield from range(p)
 		return
-	if (not sqfr): g = gcmd(g, polysubmodp(polypowmodpmodpoly([0, 1], p, p, g), [0, 1], p), p)
+	if not sqfr:
+		g = gcmd(g, polysubmodp(polypowmodpmodpoly([0, 1], p, p, g), [0, 1], p), p)
 	else:
 		g = [x % p for x in g]
 		while len(g) > 0 and g[-1] == 0:
@@ -106,8 +120,10 @@ def polyroots_prime(f, p, sqfr=False):
 		yield 0
 		while g[0] == 0:
 			del g[0]
-		if g == []: assert False
-	if len(g) == 1: return
+		if g == []:
+			assert False
+	if len(g) == 1:
+		return
 	if len(g) == 2:
 		yield (-g[0] * modinv(g[1], p)) % p
 		return  # Linear.
@@ -120,7 +136,8 @@ def polyroots_prime(f, p, sqfr=False):
 		c, b = (c * ai) % p, (b * ai) % p
 		d = b * b - 4 * c
 		l = legendre(d, p)
-		if l == -1: return
+		if l == -1:
+			return
 		sq = sqrtmod_prime(d, p)
 		inv2 = (p + 1) // 2  # inv2 == modinv(2, p)
 		yield from {((-b + sq) * inv2) % p, ((-b - sq) * inv2) % p}
