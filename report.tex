@@ -1,0 +1,27 @@
+\documentclass[]{report}
+\usepackage{}
+
+\begin{document}
+
+\title{Elliptic Curve Discrete Log problem and Static ECDSA}
+\author{Avneet Singh Channa \\ (170101015)\and Aranya Aryaman \\ (170101011)}
+\date{March, 2021}
+\maketitle
+
+\begin{abstract}
+	In this report, we aim to explore the elliptic curve discrete logarithm problem. We will document and compare the differrent attacks possible on elliptic curves cryptography. We also propose a new method of signing messages using the Elliptic Curve Digital Signing Algorithm without the use of a random nonce.
+Finally, we also provide an implementation of all the forementioned topics using the python3 programming language.
+\end{abstract}
+
+\chapter{Preliminaries}
+\section{Introduction}
+In 1985, Koblitz and Miller proposed elliptic curves to be used for publickey cryptosystems. Elliptic curves are useful because unlike conventional cryptosystems that rely on integer factorization, elliptic curve uses very small finite fields. For comparision, 160 bit primes for elliptic curves provide equivalent security as about 3000 bits of RSA modulus. This makes it faster and less computationally expensive. We will examine the role of elliptic curves on cryptography and basic 
+problems involving implementation and security of someelliptic curve cryptosystems.
+
+Let $K$ be a field and $p$ is a prime number. Then an elliptic curve can be defined over $K$ as $y^2+a_1xy+a_3y=x^3+a_2x^2+a_4x+a_6$. For simplification, we assume that the characteristic of the curve is not 2 or 3. This makes it possible to define the curve as $y^2 = x^3+ax+b$ for some coefficients $a$ and $b$ in $K$. The curve is required to be non-singular, which means the curve has no cusps or self intersections. This can be made sure by using curves with non-zero determinant, that is $\Delta=4x^3+27b^2\neq0$. The rest of the thoery also applies to.
+
+\chapter{}
+\section{Introduction}
+\subsection{Usage}
+
+\end{document}
