@@ -10,6 +10,7 @@ tests = {
     "SMART": test_smart,
     "POLLARD_RHO": test_pollard_rho,
     "POLLARD_KANGAROO": test_pollard_kangaroo,
+	"STATIC_ECDSA": 
 }
 
 

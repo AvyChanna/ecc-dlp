@@ -36,9 +36,9 @@ class ec_curve:
 		# screw tonelli shanks, hensel lift rocks
 		candidate = sqrtmod_prime(y2, self.p)
 		if (candidate**2) % self.p == y2:
-			return list(set(ec_point(x, candidate), ec_point(x, (self.p - candidate) % self.p)))
+			return list(set([ec_point(x, candidate), ec_point(x, (self.p - candidate) % self.p)]))
 		# for convenience, this won't raise
-		return None
+		return []
 
 	def from_y(self, y):
 		# Find solution(s) to x^3 + ax + (b - y^2) = 0 mod p
@@ -102,7 +102,7 @@ class ec_curve:
 	def cardinality(self):
 		if self.card is not None:
 			return self.card
-		if self.p < 200:
+		if self.p < 5000:
 			self.card = self._cardinality_naive()
 		else:
 			self.card = self._cardinality_schoof()
@@ -114,7 +114,7 @@ class ec_curve:
 		self.card = 0
 		for i in range(self.p):
 			pts = self.from_x(i)
-			if pts is not None:
+			if len(pts) != 0:
 				self.card += len(pts)
 		return self.card
 
